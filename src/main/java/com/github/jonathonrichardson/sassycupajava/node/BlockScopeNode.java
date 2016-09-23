@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +35,7 @@ public class BlockScopeNode extends AbstractNode {
         this.nodes.addAll(parser.getNodes());
     }
 
-    public String toCss(List<Selector> leadingSelectors) {
+    public String toCss(List<Selector> leadingSelectors, Map<String, String> variables) {
         if (leadingSelectors == null) {
             leadingSelectors = new ArrayList<>();
         }
@@ -61,13 +62,13 @@ public class BlockScopeNode extends AbstractNode {
             String css;
 
             if (node instanceof BlockScopeNode) {
-                css = ((BlockScopeNode) node).toCss(resolvedSelectors);
+                css = ((BlockScopeNode) node).toCss(resolvedSelectors, variables);
                 stringBuilder.append(css);
             }
             else {
                 stringBuilder.append(commaSeparatedNumbers);
                 stringBuilder.append(" {");
-                stringBuilder.append(node.toCss());
+                stringBuilder.append(node.toCss(variables));
                 stringBuilder.append("}\n");
             }
         }
@@ -76,7 +77,7 @@ public class BlockScopeNode extends AbstractNode {
     }
 
     @Override
-    public String toCss() {
-        return this.toCss(null);
+    public String toCss(Map<String, String> variables) {
+        return this.toCss(new ArrayList<Selector>(), variables);
     }
 }

@@ -4,6 +4,7 @@ import com.github.jonathonrichardson.sassycupajava.InvalidSyntaxException;
 import com.github.jonathonrichardson.sassycupajava.Parser;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by jon on 9/21/16.
@@ -26,5 +27,5 @@ public abstract class AbstractNode {
         this.originalText = parser.readToEnd();
     }
 
-    public abstract String toCss();
+    public abstract String toCss(Map<String, String> variables);
 }

@@ -5,6 +5,7 @@ import com.github.jonathonrichardson.sassycupajava.Parser;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by jon on 9/22/16.
@@ -23,7 +24,18 @@ public class KeyValueNode extends AbstractNode {
     }
 
     @Override
-    public String toCss() {
-        return "\n  " + key + ": " + value + ";";
+    public String toCss(Map<String, String> variables) {
+        if (key.startsWith("$")) {
+            variables.put(key, value);
+            return "";
+        }
+        else {
+            String valueText = value;
+
+            for (String variable : variables.keySet()) {
+                valueText = StringUtils.replace(valueText, variable, variables.get(variable));
+            }
+            return "\n  " + key + ": " + valueText + ";";
+        }
     }
 }
