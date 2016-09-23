@@ -24,7 +24,7 @@ public class SassCompiler {
 
             SassDocument document = new SassDocument(inputStream);
             compiledText = document.toString();
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException|InvalidSyntaxException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

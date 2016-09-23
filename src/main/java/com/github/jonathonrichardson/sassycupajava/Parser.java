@@ -2,6 +2,7 @@ package com.github.jonathonrichardson.sassycupajava;
 
 import com.github.jonathonrichardson.sassycupajava.node.AbstractNode;
 import com.github.jonathonrichardson.sassycupajava.node.BlockScopeNode;
+import com.github.jonathonrichardson.sassycupajava.node.KeyValueNode;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
@@ -33,24 +34,38 @@ public class Parser {
     public AbstractNode readNode() throws IOException, InvalidSyntaxException {
         stream.mark(1000);
         AbstractNode node = null;
+        StringBuilder buffer = new StringBuilder();
+
+        this.consumeWhitespace();
+        if (this.atEnd()) {
+            return null;
+        }
 
         while(true) {
             Character nextChar = this.readChar();
 
-            if (nextChar == null) {
+            if (nextChar == null && buffer.length() != 0) {
                 throw new InvalidSyntaxException(String.format(
-                        "Unexpected text at end of input: %s",
+                        "Unexpected text at end of input: \"%s\"",
                         this.readToEnd()
                 ));
             }
+            else {
+                buffer.append(nextChar);
+            }
 
+            System.out.printf("\"%s\"\n", nextChar);
             if (nextChar == '{') {
                 stream.reset();
                 node = new BlockScopeNode(this);
+                buffer = new StringBuilder();
                 break;
             }
             else if (nextChar == ';') {
-
+                stream.reset();
+                node = new KeyValueNode(this);
+                buffer = new StringBuilder();
+                break;
             }
         }
 
@@ -183,7 +198,12 @@ public class Parser {
         while (true) {
             stream.mark(1);
 
-            if (!StringUtils.isWhitespace(readChar().toString())) {
+            Character character = readChar();
+            if (character == null) {
+                return;
+            }
+
+            if (!StringUtils.isWhitespace(character.toString())) {
                 stream.reset();
                 break;
             }

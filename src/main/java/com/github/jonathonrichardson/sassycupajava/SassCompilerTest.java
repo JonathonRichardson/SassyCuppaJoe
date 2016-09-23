@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class SassCompilerTest {
     @Rule
-    public ErrorCollectorWrapper collector = new ErrorCollectorWrapper();
+    public ErrorCollector collector = new ErrorCollector();
 
     private boolean testAll = false;
 
@@ -63,7 +63,7 @@ public class SassCompilerTest {
                         collector.checkThat(compiledOutput, CoreMatchers.equalTo(expectedOutput));
                     }
                     else {
-                        assertEquals(testdir.getName(), compiledOutput, expectedOutput);
+                        assertEquals(testdir.getName(), expectedOutput, compiledOutput);
                     }
 
                 }

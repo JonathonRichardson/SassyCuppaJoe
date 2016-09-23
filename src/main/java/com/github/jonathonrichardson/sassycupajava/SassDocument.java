@@ -15,24 +15,10 @@ public class SassDocument {
     private List<AbstractNode> nodes = new ArrayList<>();
     private boolean streamCompletelyRead = false;
 
-    public SassDocument(BufferedReader inputStream) throws IOException {
-        parseNode(inputStream);
-    }
+    public SassDocument(BufferedReader inputStream) throws IOException, InvalidSyntaxException {
+        Parser parser = new Parser(inputStream);
 
-    private AbstractNode parseNode(BufferedReader inputStream) throws IOException {
-        inputStream.mark(1000); // For now, assume that we're not going to need to read more than 1000 characters before determining the node type
-
-        int charCode;
-        while (!this.streamCompletelyRead && (charCode = inputStream.read()) != -1) {
-            char currentChar = (char) charCode;
-
-            if (currentChar == '{') {
-                inputStream.reset();
-                return new BlockScopeNode(inputStream);
-            }
-        }
-
-        return null;
+        nodes.addAll(parser.getNodes());
     }
 
     public String toString() {
