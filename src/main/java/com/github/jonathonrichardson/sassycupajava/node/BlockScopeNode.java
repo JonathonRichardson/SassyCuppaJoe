@@ -2,6 +2,7 @@ package com.github.jonathonrichardson.sassycupajava.node;
 
 import com.github.jonathonrichardson.sassycupajava.InvalidSyntaxException;
 import com.github.jonathonrichardson.sassycupajava.Parser;
+import com.sun.istack.internal.NotNull;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -33,23 +34,49 @@ public class BlockScopeNode extends AbstractNode {
         this.nodes.addAll(parser.getNodes());
     }
 
-    @Override
-    public String toCss() {
+    public String toCss(List<Selector> leadingSelectors) {
+        if (leadingSelectors == null) {
+            leadingSelectors = new ArrayList<>();
+        }
+
+        List<Selector> resolvedSelectors = new ArrayList<>();
+        if (leadingSelectors.size() > 0) {
+            for (Selector selector : leadingSelectors) {
+                for (Selector innerSelector : this.selectors) {
+                    resolvedSelectors.add(new Selector(selector.text + " " + innerSelector.text));
+                }
+            }
+        }
+        else {
+            resolvedSelectors = this.selectors;
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
 
-        String commaSeparatedNumbers = selectors.stream()
+        String commaSeparatedNumbers = resolvedSelectors.stream()
                 .map(i -> i.text)
                 .collect(Collectors.joining(", "));
 
-        stringBuilder.append(commaSeparatedNumbers);
-        stringBuilder.append(" {");
-
         for (AbstractNode node: nodes) {
-            stringBuilder.append(node.toCss());
+            String css;
+
+            if (node instanceof BlockScopeNode) {
+                css = ((BlockScopeNode) node).toCss(resolvedSelectors);
+                stringBuilder.append(css);
+            }
+            else {
+                stringBuilder.append(commaSeparatedNumbers);
+                stringBuilder.append(" {");
+                stringBuilder.append(node.toCss());
+                stringBuilder.append("}\n");
+            }
         }
 
-        stringBuilder.append(" }\n");
-
         return stringBuilder.toString();
+    }
+
+    @Override
+    public String toCss() {
+        return this.toCss(null);
     }
 }

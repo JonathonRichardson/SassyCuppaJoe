@@ -2,6 +2,7 @@ package com.github.jonathonrichardson.sassycupajava;
 
 import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Rule;
@@ -63,7 +64,7 @@ public class SassCompilerTest {
                         collector.checkThat(compiledOutput, CoreMatchers.equalTo(expectedOutput));
                     }
                     else {
-                        assertEquals(testdir.getName(), expectedOutput, compiledOutput);
+                        assertEquals(testdir.getName(), stripWhitespace(expectedOutput), stripWhitespace(compiledOutput));
                     }
 
                 }
@@ -72,6 +73,12 @@ public class SassCompilerTest {
         else {
             fail("SpecDir should be a directory");
         }
+    }
+
+    public static String stripWhitespace(String text) {
+        text = StringUtils.replace(text, " ",  "");
+        text = StringUtils.replace(text, "\n", "");
+        return text;
     }
 
     public static void print(String text) {
