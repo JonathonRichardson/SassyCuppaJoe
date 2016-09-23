@@ -81,7 +81,7 @@ public class BlockScopeNode extends AbstractNode {
                     stringBuilder.append(queue.remove(0).toCss(variables));
                 }
 
-                stringBuilder.append("}\n");
+                stringBuilder.append(" }\n");
             }
 
         }
@@ -92,5 +92,14 @@ public class BlockScopeNode extends AbstractNode {
     @Override
     public String toCss(Map<String, String> variables) {
         return this.toCss(new ArrayList<Selector>(), variables);
+    }
+
+    @Override
+    public void evalVariables(Map<String, String> variables) {
+        super.evalVariables(variables);
+
+        for (AbstractNode node : nodes) {
+            node.evalVariables(variables);
+        }
     }
 }

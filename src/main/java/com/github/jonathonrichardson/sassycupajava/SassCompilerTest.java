@@ -64,7 +64,9 @@ public class SassCompilerTest {
                         collector.checkThat(compiledOutput, CoreMatchers.equalTo(expectedOutput));
                     }
                     else {
-                        assertEquals(testdir.getName(), stripWhitespace(expectedOutput), stripWhitespace(compiledOutput));
+                        //if (!stripWhitespace(expectedOutput).equals(stripWhitespace(compiledOutput))) {
+                            assertEquals(testdir.getName(), expectedOutput, compiledOutput);
+                        //}
                     }
 
                 }

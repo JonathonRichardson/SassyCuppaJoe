@@ -2,6 +2,7 @@ package com.github.jonathonrichardson.sassycupajava;
 
 import com.github.jonathonrichardson.sassycupajava.node.AbstractNode;
 import com.github.jonathonrichardson.sassycupajava.node.BlockScopeNode;
+import com.github.jonathonrichardson.sassycupajava.node.CommentNode;
 import com.github.jonathonrichardson.sassycupajava.node.KeyValueNode;
 import org.apache.commons.lang.StringUtils;
 
@@ -41,6 +42,11 @@ public class Parser {
             return null;
         }
 
+        String peak2 = this.peek(2);
+        if (peak2.equals("/*") || peak2.equals("//")) {
+            return new CommentNode(this);
+        }
+
         while(true) {
             Character nextChar = this.readChar();
 
@@ -54,7 +60,6 @@ public class Parser {
                 buffer.append(nextChar);
             }
 
-            System.out.printf("\"%s\"\n", nextChar);
             if (nextChar == '{') {
                 stream.reset();
                 node = new BlockScopeNode(this);
@@ -155,6 +160,29 @@ public class Parser {
         return nodes;
     }
 
+    public String slurpToChar(String stopString) throws IOException, InvalidSyntaxException {
+        StringBuilder slurpedText = new StringBuilder();
+
+        while(!this.peek(stopString.length()).equals(stopString)) {
+            Character character = this.readChar();
+
+            if (character == null) {
+                throw new InvalidSyntaxException(String.format(
+                        "Unexpected end of input.  Expected %s, but got %s",
+                        stopString,
+                        slurpedText.toString()
+                ));
+            }
+            else {
+                slurpedText.append(character);
+            }
+        }
+
+        this.stream.skip(stopString.length());
+
+        return slurpedText.toString();
+    }
+
     /**
      * Consumes up to and including the stop character, but only returns the characters
      * before the stop character.
@@ -165,28 +193,7 @@ public class Parser {
      * @throws InvalidSyntaxException
      */
     public String slurpToChar(char stopChar) throws IOException, InvalidSyntaxException {
-        StringBuilder slurpedText = new StringBuilder();
-        Character stopCharacter = new Character(stopChar);
-
-        while(true) {
-            Character character = this.readChar();
-
-            if (character == null) {
-                throw new InvalidSyntaxException(String.format(
-                        "Unexpected end of input.  Expected %s, but got %s",
-                        stopChar,
-                        slurpedText.toString()
-                ));
-            }
-            else if (character.equals(stopCharacter)) {
-                break;
-            }
-            else {
-                slurpedText.append(character);
-            }
-        }
-
-        return slurpedText.toString();
+        return this.slurpToChar((new Character(stopChar)).toString());
     }
 
     /**

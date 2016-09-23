@@ -24,13 +24,17 @@ public class SassDocument {
     }
 
     public String toString() {
-        StringBuilder cssString = new StringBuilder();
+        SassPrinter printer = new SassPrinter(this);
+        return printer.print();
+    }
 
-        Map<String, String> variables = new HashMap<>();
+    public List<AbstractNode> getNodes() {
+        return nodes;
+    }
+
+    public void evalVariables(Map<String, String> variables) {
         for (AbstractNode node : nodes) {
-            cssString.append(node.toCss(variables));
+            node.evalVariables(variables);
         }
-
-        return cssString.toString();
     }
 }

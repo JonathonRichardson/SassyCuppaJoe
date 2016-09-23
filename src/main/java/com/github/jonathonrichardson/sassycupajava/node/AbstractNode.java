@@ -2,15 +2,18 @@ package com.github.jonathonrichardson.sassycupajava.node;
 
 import com.github.jonathonrichardson.sassycupajava.InvalidSyntaxException;
 import com.github.jonathonrichardson.sassycupajava.Parser;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by jon on 9/21/16.
  */
 public abstract class AbstractNode {
-    private String originalText = null;
+    private Map<String, String> context = new HashMap<>();
+    protected String originalText = null;
 
     protected AbstractNode() {}
 
@@ -27,5 +30,26 @@ public abstract class AbstractNode {
         this.originalText = parser.readToEnd();
     }
 
-    public abstract String toCss(Map<String, String> variables);
+    protected Map<String, String> getVariableContext() {
+        return context;
+    }
+
+    public void evalVariables(Map<String, String> variables) {
+        this.context.clear();
+
+        // Cache the variables for interpolation later
+        for(String key : context.keySet()) {
+            this.context.put(key, context.get(key));
+        }
+    }
+
+    public String renderValueInContext(String value) {
+        String valueText = value;
+
+        for (String variable : getVariableContext().keySet()) {
+            valueText = StringUtils.replace(valueText, variable, getVariableContext().get(variable));
+        }
+
+        return valueText;
+    }
 }
