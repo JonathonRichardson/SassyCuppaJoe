@@ -15,5 +15,6 @@
     <orderEntry type="library" name="Apache Commons" level="project" />
     <orderEntry type="library" name="commons-io:commons-io:2.5" level="project" />
     <orderEntry type="library" name="com.btmatthews.hamcrest:hamcrest-matchers:1.0.1" level="project" />
+    <orderEntry type="library" name="com.google.guava:guava:19.0" level="project" />
   </component>
 </module>

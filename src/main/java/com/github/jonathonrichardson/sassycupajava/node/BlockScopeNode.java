@@ -2,6 +2,7 @@ package com.github.jonathonrichardson.sassycupajava.node;
 
 import com.github.jonathonrichardson.sassycupajava.InvalidSyntaxException;
 import com.github.jonathonrichardson.sassycupajava.Parser;
+import com.google.common.collect.Lists;
 import com.sun.istack.internal.NotNull;
 import org.apache.commons.lang.StringUtils;
 
@@ -58,19 +59,31 @@ public class BlockScopeNode extends AbstractNode {
                 .map(i -> i.text)
                 .collect(Collectors.joining(", "));
 
-        for (AbstractNode node: nodes) {
-            String css;
+        List<AbstractNode> queue = new ArrayList<>();
+        queue.addAll(nodes);
 
-            if (node instanceof BlockScopeNode) {
-                css = ((BlockScopeNode) node).toCss(resolvedSelectors, variables);
+        AbstractNode curQueueEntry;
+        while(queue.size() > 0) {
+            curQueueEntry = queue.remove(0);
+
+            if (curQueueEntry instanceof BlockScopeNode) {
+                String css;
+                css = ((BlockScopeNode) curQueueEntry).toCss(resolvedSelectors, variables);
                 stringBuilder.append(css);
             }
             else {
                 stringBuilder.append(commaSeparatedNumbers);
                 stringBuilder.append(" {");
-                stringBuilder.append(node.toCss(variables));
+
+                stringBuilder.append(curQueueEntry.toCss(variables));
+
+                while(!queue.isEmpty() && (queue.get(0) instanceof KeyValueNode)) {
+                    stringBuilder.append(queue.remove(0).toCss(variables));
+                }
+
                 stringBuilder.append("}\n");
             }
+
         }
 
         return stringBuilder.toString();

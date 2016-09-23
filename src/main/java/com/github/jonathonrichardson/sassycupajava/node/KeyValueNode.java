@@ -25,16 +25,17 @@ public class KeyValueNode extends AbstractNode {
 
     @Override
     public String toCss(Map<String, String> variables) {
+        String valueText = value;
+
+        for (String variable : variables.keySet()) {
+            valueText = StringUtils.replace(valueText, variable, variables.get(variable));
+        }
+
         if (key.startsWith("$")) {
-            variables.put(key, value);
+            variables.put(key, valueText);
             return "";
         }
         else {
-            String valueText = value;
-
-            for (String variable : variables.keySet()) {
-                valueText = StringUtils.replace(valueText, variable, variables.get(variable));
-            }
             return "\n  " + key + ": " + valueText + ";";
         }
     }
